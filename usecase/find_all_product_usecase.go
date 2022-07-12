@@ -24,7 +24,7 @@ func (f *findAllProductUsecase) FindAllProduct() ([]model.Product, error) {
 	if ok {
 		return products, nil
 	}
-	return nil, utils.NewCastInterfaceError("table")
+	return nil, utils.NewCastInterfaceError("product")
 
 }
 
