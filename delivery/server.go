@@ -16,7 +16,7 @@ type appServer struct {
 }
 
 func (a *appServer) initHandlers() {
-	controller.NewProductController(a.engine, a.usecaseManager.ProductRegistrationUsecase())
+	controller.NewProductController(a.engine, a.usecaseManager.ProductRegistrationUsecase(), a.usecaseManager.FindAllProductUsecase(), a.usecaseManager.UpdateProductUsecase(), a.usecaseManager.DeleteProductUsecase(), a.usecaseManager.GetProductByIdUsecase(), a.usecaseManager.GetProductByCategoryUsecase())
 }
 
 func (a *appServer) Run() {

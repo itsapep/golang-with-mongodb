@@ -6,11 +6,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ProductRepository interface {
 	Add(entity interface{}) error
-	Retrieve() (interface{}, error)
+	Retrieve(page int64, limit int64) (interface{}, error)
 	Get(by interface{}) (interface{}, error)
 	Update(by interface{}, entity interface{}) error
 	Delete(entity interface{}) error
@@ -84,11 +85,15 @@ func (p *productRepository) Add(entity interface{}) error {
 }
 
 // Retrieve implements ProductRepository
-func (p *productRepository) Retrieve() (interface{}, error) {
+func (p *productRepository) Retrieve(page int64, limit int64) (interface{}, error) {
 	var products = []model.Product{}
 	ctx, cancel := utils.InitContext()
 	defer cancel()
-	cursor, err := p.db.Collection("products").Find(ctx, bson.M{})
+	opts := options.FindOptions{
+		Skip:  &page,
+		Limit: &limit,
+	}
+	cursor, err := p.db.Collection("products").Find(ctx, bson.M{}, &opts)
 	if err != nil {
 		return nil, err
 	}

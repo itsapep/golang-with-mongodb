@@ -3,10 +3,12 @@ package controller
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/itsapep/golang-with-mongodb/delivery/api"
 	"github.com/itsapep/golang-with-mongodb/model"
+	"github.com/itsapep/golang-with-mongodb/model/dto"
 	"github.com/itsapep/golang-with-mongodb/usecase"
 	"github.com/itsapep/golang-with-mongodb/utils"
 )
@@ -40,7 +42,15 @@ func (pc *ProductController) registerNewProduct(ctx *gin.Context) {
 }
 
 func (pc *ProductController) findAllProduct(ctx *gin.Context) {
-	products, err := pc.prodFindAllUc.FindAllProduct()
+	var pageData dto.Paging
+	err := ctx.ShouldBindJSON(&pageData)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+	convertPage, _ := strconv.Atoi(pageData.Page)
+	convertLimit, _ := strconv.Atoi(pageData.Limit)
+	products, err := pc.prodFindAllUc.FindAllProduct(int64(convertPage), int64(convertLimit))
 	if err != nil {
 		pc.Failed(ctx, err)
 		return
@@ -96,16 +106,22 @@ func (pc *ProductController) getProductByCategory(ctx *gin.Context) {
 	pc.Success(ctx, products)
 }
 
-func NewProductController(router *gin.Engine, prodRegUc usecase.ProductRegistrationUsecase) *ProductController {
+func NewProductController(router *gin.Engine,
+	prodRegUc usecase.ProductRegistrationUsecase,
+	prodFindAllUc usecase.FindAllProductUsecase,
+	prodUpdUc usecase.UpdateProductUsecase,
+	prodDelUc usecase.DeleteProductUsecase,
+	prodGetIdUc usecase.GetProductByIdUsecase,
+	prodGetCatUc usecase.GetProductByCategoryUsecase) *ProductController {
 	controller := ProductController{
 		router:    router,
 		prodRegUc: prodRegUc,
 	}
 	router.POST("/product", controller.registerNewProduct)
-	router.GET("/product", controller.findAllProduct)
-	router.PUT("/product/:id", controller.updateProductById)
-	router.DELETE("/product/:id", controller.deleteProductById)
-	router.GET("/product/:id", controller.getProductById)
-	router.GET("/product/:category", controller.getProductByCategory)
+	router.GET("/product/all", controller.findAllProduct)
+	router.PUT("/product/?id=:id", controller.updateProductById)
+	router.DELETE("/product/?id=:id", controller.deleteProductById)
+	router.GET("/product/?id=:id", controller.getProductById)
+	router.GET("/product/?category=:category", controller.getProductByCategory)
 	return &controller
 }

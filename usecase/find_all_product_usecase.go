@@ -7,7 +7,7 @@ import (
 )
 
 type FindAllProductUsecase interface {
-	FindAllProduct() ([]model.Product, error)
+	FindAllProduct(page int64, limit int64) ([]model.Product, error)
 }
 
 type findAllProductUsecase struct {
@@ -15,8 +15,8 @@ type findAllProductUsecase struct {
 }
 
 // Register implements FindAllProductUsecase
-func (f *findAllProductUsecase) FindAllProduct() ([]model.Product, error) {
-	productsInterface, err := f.repo.Retrieve()
+func (f *findAllProductUsecase) FindAllProduct(page int64, limit int64) ([]model.Product, error) {
+	productsInterface, err := f.repo.Retrieve(page, limit)
 	if err != nil {
 		return nil, err
 	}
