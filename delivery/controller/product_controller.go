@@ -119,9 +119,9 @@ func NewProductController(router *gin.Engine,
 	}
 	router.POST("/product", controller.registerNewProduct)
 	router.GET("/product/all", controller.findAllProduct)
-	router.PUT("/product/?id=:id", controller.updateProductById)
-	router.DELETE("/product/?id=:id", controller.deleteProductById)
-	router.GET("/product/?id=:id", controller.getProductById)
-	router.GET("/product/?category=:category", controller.getProductByCategory)
+	router.PUT("/product/id/:id", controller.updateProductById)
+	router.DELETE("/product/id/:id", controller.deleteProductById)
+	router.GET("/product/id/:id", controller.getProductById)
+	router.GET("/product/category/:category", controller.getProductByCategory)
 	return &controller
 }
